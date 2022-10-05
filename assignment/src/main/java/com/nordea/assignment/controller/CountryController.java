@@ -1,6 +1,7 @@
 package com.nordea.assignment.controller;
 
 import com.nordea.assignment.model.Country;
+import com.nordea.assignment.model.CountryListItem;
 import com.nordea.assignment.service.CountryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +23,7 @@ public class CountryController {
     }
 
     @GetMapping
-    public List<Country> retrieveCountryList() {
+    public List<CountryListItem> retrieveCountryList() {
         return countryService.retrieveCountryList();
     }
 

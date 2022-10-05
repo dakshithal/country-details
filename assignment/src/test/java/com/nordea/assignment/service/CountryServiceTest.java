@@ -1,6 +1,7 @@
 package com.nordea.assignment.service;
 
 import com.nordea.assignment.model.Country;
+import com.nordea.assignment.model.CountryListItem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +25,7 @@ public class CountryServiceTest {
 
     @Test
     public void retrieveCountryListSuccess() {
-        List<Country> countries = countryService.retrieveCountryList();
+        List<CountryListItem> countries = countryService.retrieveCountryList();
         assertNotNull(countries);
     }
 

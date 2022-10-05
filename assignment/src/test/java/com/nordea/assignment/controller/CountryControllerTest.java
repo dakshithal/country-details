@@ -2,6 +2,7 @@ package com.nordea.assignment.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nordea.assignment.model.Country;
+import com.nordea.assignment.model.CountryListItem;
 import com.nordea.assignment.service.CountryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,9 @@ public class CountryControllerTest {
 
     private Country country1;
     private Country country2;
-    private List<Country> countries;
+    private CountryListItem countryListItem1;
+    private CountryListItem countryListItem2;
+    private List<CountryListItem> countries;
 
     @BeforeEach
     public void setUp() {
@@ -51,12 +54,18 @@ public class CountryControllerTest {
         country1 = new Country();
         country1.setName(COUNTRY_1_NAME);
         country1.setCountryCode(COUNTRY_1_CODE);
-        countries.add(country1);
+        countryListItem1 = new CountryListItem();
+        countryListItem1.setName(COUNTRY_1_NAME);
+        countryListItem1.setCountryCode(COUNTRY_1_CODE);
+        countries.add(countryListItem1);
 
         country2 = new Country();
         country2.setName(COUNTRY_2_NAME);
         country2.setCountryCode(COUNTRY_2_CODE);
-        countries.add(country2);
+        countryListItem2 = new CountryListItem();
+        countryListItem2.setName(COUNTRY_2_NAME);
+        countryListItem2.setCountryCode(COUNTRY_2_CODE);
+        countries.add(countryListItem2);
     }
 
     @Test

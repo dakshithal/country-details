@@ -1,6 +1,7 @@
 package com.nordea.assignment.service;
 
 import com.nordea.assignment.model.Country;
+import com.nordea.assignment.model.CountryListItem;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -8,7 +9,7 @@ import java.util.List;
 
 @Service
 public class CountryService {
-    public List<Country> retrieveCountryList() {
+    public List<CountryListItem> retrieveCountryList() {
         return new ArrayList<>();
     }
 
