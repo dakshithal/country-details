@@ -38,8 +38,14 @@ public class CountryControllerTest {
 
     final String COUNTRY_1_NAME = "Country-1";
     final String COUNTRY_1_CODE = "C1";
+    final String COUNTRY_1_CAPITAL = "Capital-1";
+    final int COUNTRY_1_POPULATION = 100000;
+    final String COUNTRY_1_FLAG = "Flag-1";
     final String COUNTRY_2_NAME = "Country-2";
     final String COUNTRY_2_CODE = "C2";
+    final String COUNTRY_2_CAPITAL = "Capital-2";
+    final int COUNTRY_2_POPULATION = 200000;
+    final String COUNTRY_2_FLAG = "Flag-2";
 
     private Country country1;
     private Country country2;
@@ -51,15 +57,11 @@ public class CountryControllerTest {
     public void setUp() {
         countries = new ArrayList<>();
 
-        country1 = new Country();
-        country1.setName(COUNTRY_1_NAME);
-        country1.setCountryCode(COUNTRY_1_CODE);
+        country1 = new Country(COUNTRY_1_NAME, COUNTRY_1_CODE, COUNTRY_1_CAPITAL, COUNTRY_1_POPULATION, COUNTRY_1_FLAG);
         countryListItem1 = new CountryListItem(COUNTRY_1_NAME, COUNTRY_1_CODE);
         countries.add(countryListItem1);
 
-        country2 = new Country();
-        country2.setName(COUNTRY_2_NAME);
-        country2.setCountryCode(COUNTRY_2_CODE);
+        country2 = new Country(COUNTRY_2_NAME, COUNTRY_2_CODE, COUNTRY_2_CAPITAL, COUNTRY_2_POPULATION, COUNTRY_2_FLAG);
         countryListItem2 = new CountryListItem(COUNTRY_2_NAME, COUNTRY_2_CODE);
         countries.add(countryListItem2);
     }
@@ -82,6 +84,7 @@ public class CountryControllerTest {
     @Test
     public void retrieveCountryByNameSuccess() throws Exception {
         Mockito.when(countryService.retrieveCountry(COUNTRY_1_NAME)).thenReturn(country1);
+        Mockito.when(countryService.retrieveCountry(COUNTRY_2_NAME)).thenReturn(country2);
 
         mockMvc.perform(get("/countries/" + COUNTRY_1_NAME)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -91,6 +94,15 @@ public class CountryControllerTest {
                 .andExpect(jsonPath("$.name").value(COUNTRY_1_NAME))
                 .andExpect(jsonPath("$.countryCode").value(COUNTRY_1_CODE));
 
+        mockMvc.perform(get("/countries/" + COUNTRY_2_NAME)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(country2))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(COUNTRY_2_NAME))
+                .andExpect(jsonPath("$.countryCode").value(COUNTRY_2_CODE));
+
         verify(countryService, times(1)).retrieveCountry(COUNTRY_1_NAME);
+        verify(countryService, times(1)).retrieveCountry(COUNTRY_2_NAME);
     }
 }
