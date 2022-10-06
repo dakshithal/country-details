@@ -26,6 +26,7 @@ public class CountryServiceTest {
     final String CAPITAL_QUERY = "/capital/";
     final String POPULATION_QUERY = "/population/";
     final String FLAG_QUERY = "/flag/";
+
     final String COUNTRY_1_NAME = "Country-1";
     final String COUNTRY_1_CODE = "C1";
     final String COUNTRY_1_CAPITAL = "Capital-1";
@@ -34,6 +35,7 @@ public class CountryServiceTest {
     final int COUNTRY_1_POPULATION_2 = 100001;
     final int COUNTRY_1_POPULATION_2_YEAR = 2012;
     final String COUNTRY_1_FLAG = "Flag-1";
+
     final String COUNTRY_2_NAME = "Country-2";
     final String COUNTRY_2_CODE = "C2";
     final String COUNTRY_2_CAPITAL = "Capital-2";
@@ -47,14 +49,23 @@ public class CountryServiceTest {
     private CountryListResponseItem countryListResponseItem1;
     private CountryListResponseItem countryListResponseItem2;
 
-    private CountryCapitalResponse capitalResponse;
-    private CountryCapitalData capitalData;
-    private CountryPopulationResponse populationResponse;
-    private CountryPopulationData populationData;
-    private AnnualPopulation annualPopulation1;
-    private AnnualPopulation annualPopulation2;
-    private CountryFlagResponse flagResponse;
-    private CountryFlagData flagData;
+    private CountryCapitalResponse country1CapitalResponse;
+    private CountryCapitalData country1CapitalData;
+    private CountryPopulationResponse country1PopulationResponse;
+    private CountryPopulationData country1PopulationData;
+    private AnnualPopulation country1AnnualPopulation1;
+    private AnnualPopulation country1AnnualPopulation2;
+    private CountryFlagResponse country1FlagResponse;
+    private CountryFlagData country1FlagData;
+
+    private CountryCapitalResponse country2CapitalResponse;
+    private CountryCapitalData country2CapitalData;
+    private CountryPopulationResponse country2PopulationResponse;
+    private CountryPopulationData country2PopulationData;
+    private AnnualPopulation country2AnnualPopulation1;
+    private AnnualPopulation country2AnnualPopulation2;
+    private CountryFlagResponse country2FlagResponse;
+    private CountryFlagData country2FlagData;
 
     @BeforeEach
     public void setUp() {
@@ -72,35 +83,65 @@ public class CountryServiceTest {
         Mockito.when(restTemplate.getForObject(TEST_URL, CountryListResponse.class))
                 .thenReturn(countryListResponse);
 
-        capitalResponse = new CountryCapitalResponse();
-        capitalData = new CountryCapitalData();
-        capitalData.setName(COUNTRY_1_NAME);
-        capitalData.setIso2(COUNTRY_1_CODE);
-        capitalData.setCapital(COUNTRY_1_CAPITAL);
-        capitalResponse.setData(capitalData);
+        country1CapitalResponse = new CountryCapitalResponse();
+        country1CapitalData = new CountryCapitalData();
+        country1CapitalData.setName(COUNTRY_1_NAME);
+        country1CapitalData.setIso2(COUNTRY_1_CODE);
+        country1CapitalData.setCapital(COUNTRY_1_CAPITAL);
+        country1CapitalResponse.setData(country1CapitalData);
         Mockito.when(restTemplate.getForObject(TEST_URL + CAPITAL_QUERY + COUNTRY_1_NAME, CountryCapitalResponse.class))
-                .thenReturn(capitalResponse);
+                .thenReturn(country1CapitalResponse);
 
-        populationResponse = new CountryPopulationResponse();
-        populationData = new CountryPopulationData();
-        annualPopulation1 = new AnnualPopulation();
-        annualPopulation1.setYear(COUNTRY_1_POPULATION_1_YEAR);
-        annualPopulation1.setValue(COUNTRY_1_POPULATION_1);
-        annualPopulation2 = new AnnualPopulation();
-        annualPopulation2.setYear(COUNTRY_1_POPULATION_2_YEAR);
-        annualPopulation2.setValue(COUNTRY_1_POPULATION_2);
-        AnnualPopulation[] annualPopulations = { annualPopulation1, annualPopulation2 };
-        populationData.setPopulationCounts(annualPopulations);
-        populationResponse.setData(populationData);
+        country1PopulationResponse = new CountryPopulationResponse();
+        country1PopulationData = new CountryPopulationData();
+        country1AnnualPopulation1 = new AnnualPopulation();
+        country1AnnualPopulation1.setYear(COUNTRY_1_POPULATION_1_YEAR);
+        country1AnnualPopulation1.setValue(COUNTRY_1_POPULATION_1);
+        country1AnnualPopulation2 = new AnnualPopulation();
+        country1AnnualPopulation2.setYear(COUNTRY_1_POPULATION_2_YEAR);
+        country1AnnualPopulation2.setValue(COUNTRY_1_POPULATION_2);
+        AnnualPopulation[] country1Populations = { country1AnnualPopulation1, country1AnnualPopulation2 };
+        country1PopulationData.setPopulationCounts(country1Populations);
+        country1PopulationResponse.setData(country1PopulationData);
         Mockito.when(restTemplate.getForObject(TEST_URL + POPULATION_QUERY + COUNTRY_1_NAME, CountryPopulationResponse.class))
-                .thenReturn(populationResponse);
+                .thenReturn(country1PopulationResponse);
 
-        flagResponse = new CountryFlagResponse();
-        flagData = new CountryFlagData();
-        flagData.setFlag(COUNTRY_1_FLAG);
-        flagResponse.setData(flagData);
+        country1FlagResponse = new CountryFlagResponse();
+        country1FlagData = new CountryFlagData();
+        country1FlagData.setFlag(COUNTRY_1_FLAG);
+        country1FlagResponse.setData(country1FlagData);
         Mockito.when(restTemplate.getForObject(TEST_URL + FLAG_QUERY + COUNTRY_1_NAME, CountryFlagResponse.class))
-                .thenReturn(flagResponse);
+                .thenReturn(country1FlagResponse);
+
+        country2CapitalResponse = new CountryCapitalResponse();
+        country2CapitalData = new CountryCapitalData();
+        country2CapitalData.setName(COUNTRY_2_NAME);
+        country2CapitalData.setIso2(COUNTRY_2_CODE);
+        country2CapitalData.setCapital(COUNTRY_2_CAPITAL);
+        country2CapitalResponse.setData(country2CapitalData);
+        Mockito.when(restTemplate.getForObject(TEST_URL + CAPITAL_QUERY + COUNTRY_2_NAME, CountryCapitalResponse.class))
+                .thenReturn(country2CapitalResponse);
+
+        country2PopulationResponse = new CountryPopulationResponse();
+        country2PopulationData = new CountryPopulationData();
+        country2AnnualPopulation1 = new AnnualPopulation();
+        country2AnnualPopulation1.setYear(COUNTRY_2_POPULATION_1_YEAR);
+        country2AnnualPopulation1.setValue(COUNTRY_2_POPULATION_1);
+        country2AnnualPopulation2 = new AnnualPopulation();
+        country2AnnualPopulation2.setYear(COUNTRY_2_POPULATION_2_YEAR);
+        country2AnnualPopulation2.setValue(COUNTRY_2_POPULATION_2);
+        AnnualPopulation[] country2Populations = { country2AnnualPopulation1, country2AnnualPopulation2 };
+        country2PopulationData.setPopulationCounts(country2Populations);
+        country2PopulationResponse.setData(country2PopulationData);
+        Mockito.when(restTemplate.getForObject(TEST_URL + POPULATION_QUERY + COUNTRY_2_NAME, CountryPopulationResponse.class))
+                .thenReturn(country2PopulationResponse);
+
+        country2FlagResponse = new CountryFlagResponse();
+        country2FlagData = new CountryFlagData();
+        country2FlagData.setFlag(COUNTRY_2_FLAG);
+        country2FlagResponse.setData(country2FlagData);
+        Mockito.when(restTemplate.getForObject(TEST_URL + FLAG_QUERY + COUNTRY_2_NAME, CountryFlagResponse.class))
+                .thenReturn(country2FlagResponse);
 
         countryService = new CountryService(TEST_URL, CAPITAL_QUERY, POPULATION_QUERY, FLAG_QUERY, restTemplate);
     }
@@ -116,12 +157,20 @@ public class CountryServiceTest {
 
     @Test
     public void retrieveCountryByNameSuccess() {
-        Country country = countryService.retrieveCountry(COUNTRY_1_NAME);
-        assertNotNull(country);
-        assertEquals(COUNTRY_1_NAME, country.getName());
-        assertEquals(COUNTRY_1_CODE, country.getCountryCode());
-        assertEquals(COUNTRY_1_CAPITAL, country.getCapital());
-        assertEquals(COUNTRY_1_POPULATION_2, country.getPopulation());
-        assertEquals(COUNTRY_1_FLAG, country.getFlagFileUrl());
+        Country country1 = countryService.retrieveCountry(COUNTRY_1_NAME);
+        assertNotNull(country1);
+        assertEquals(COUNTRY_1_NAME, country1.getName());
+        assertEquals(COUNTRY_1_CODE, country1.getCountryCode());
+        assertEquals(COUNTRY_1_CAPITAL, country1.getCapital());
+        assertEquals(COUNTRY_1_POPULATION_2, country1.getPopulation());
+        assertEquals(COUNTRY_1_FLAG, country1.getFlagFileUrl());
+
+        Country country2 = countryService.retrieveCountry(COUNTRY_2_NAME);
+        assertNotNull(country2);
+        assertEquals(COUNTRY_2_NAME, country2.getName());
+        assertEquals(COUNTRY_2_CODE, country2.getCountryCode());
+        assertEquals(COUNTRY_2_CAPITAL, country2.getCapital());
+        assertEquals(COUNTRY_2_POPULATION_1, country2.getPopulation());
+        assertEquals(COUNTRY_2_FLAG, country2.getFlagFileUrl());
     }
 }
