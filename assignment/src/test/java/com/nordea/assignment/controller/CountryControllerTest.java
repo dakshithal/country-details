@@ -31,7 +31,7 @@ public class CountryControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     @MockBean
     private CountryService countryService;
@@ -54,17 +54,13 @@ public class CountryControllerTest {
         country1 = new Country();
         country1.setName(COUNTRY_1_NAME);
         country1.setCountryCode(COUNTRY_1_CODE);
-        countryListItem1 = new CountryListItem();
-        countryListItem1.setName(COUNTRY_1_NAME);
-        countryListItem1.setCountryCode(COUNTRY_1_CODE);
+        countryListItem1 = new CountryListItem(COUNTRY_1_NAME, COUNTRY_1_CODE);
         countries.add(countryListItem1);
 
         country2 = new Country();
         country2.setName(COUNTRY_2_NAME);
         country2.setCountryCode(COUNTRY_2_CODE);
-        countryListItem2 = new CountryListItem();
-        countryListItem2.setName(COUNTRY_2_NAME);
-        countryListItem2.setCountryCode(COUNTRY_2_CODE);
+        countryListItem2 = new CountryListItem(COUNTRY_2_NAME, COUNTRY_2_CODE);
         countries.add(countryListItem2);
     }
 
