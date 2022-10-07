@@ -1,12 +1,13 @@
 package com.nordea.assignment.service;
 
+import com.nordea.assignment.client.RemoteServiceClient;
 import com.nordea.assignment.dto.*;
+import com.nordea.assignment.model.Countries;
 import com.nordea.assignment.model.Country;
 import com.nordea.assignment.model.CountryListItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -15,11 +16,11 @@ import java.util.stream.Collectors;
 
 @Service
 public class CountryService {
-    private String externalCountryServiceUrl;
-    private String capitalQuery;
-    private String populationQuery;
-    private String flagQuery;
-    private RestTemplate restTemplate;
+    private final String externalUrl;
+    private final String capitalQuery;
+    private final String populationQuery;
+    private final String flagQuery;
+    private final RemoteServiceClient remoteClient;
 
     @Autowired
     public CountryService(
@@ -27,33 +28,32 @@ public class CountryService {
             @Value("${remote.service.query.capital}") String capitalQuery,
             @Value("${remote.service.query.population}") String populationQuery,
             @Value("${remote.service.query.flag}") String flagQuery,
-            RestTemplate restTemplate) {
-        this.externalCountryServiceUrl = externalCountryServiceUrl;
+            RemoteServiceClient remoteClient) {
+        this.externalUrl = externalCountryServiceUrl;
         this.capitalQuery = capitalQuery;
         this.populationQuery = populationQuery;
         this.flagQuery = flagQuery;
-        this.restTemplate = restTemplate;
+        this.remoteClient = remoteClient;
     }
 
-    public List<CountryListItem> retrieveCountryList() {
-        CountryListResponse response
-                = restTemplate.getForObject(externalCountryServiceUrl, CountryListResponse.class);
-        return Arrays.stream(response.getData())
+    public Countries retrieveCountryList() {
+        CountryListResponse response = remoteClient.getForObject(externalUrl, CountryListResponse.class);
+        List<CountryListItem> countries = Arrays.stream(response.getData())
                 .map((item) -> {
                     CountryListItem modelItem = new CountryListItem(item.getCountry(), item.getIso2());
                     return modelItem;
                 })
                 .collect(Collectors.toList());
+        return new Countries(countries);
     }
 
     public Country retrieveCountry(String countryName) {
-        CountryCapitalResponse capitalResponse = restTemplate.getForObject(
-                externalCountryServiceUrl + capitalQuery + countryName, CountryCapitalResponse.class);
-        CountryPopulationResponse populationResponse= restTemplate.getForObject(
-                externalCountryServiceUrl + populationQuery + countryName, CountryPopulationResponse.class);
-        CountryFlagResponse flagResponse = restTemplate.getForObject(
-                externalCountryServiceUrl + flagQuery + countryName, CountryFlagResponse.class);
-
+        CountryCapitalResponse capitalResponse =
+                remoteClient.getForObject(externalUrl + capitalQuery + countryName, CountryCapitalResponse.class);
+        CountryPopulationResponse populationResponse =
+                remoteClient.getForObject(externalUrl + populationQuery + countryName, CountryPopulationResponse.class);
+        CountryFlagResponse flagResponse =
+                remoteClient.getForObject(externalUrl + flagQuery + countryName, CountryFlagResponse.class);
         String name = capitalResponse.getData().getName();
         String capital = capitalResponse.getData().getCapital();
         String code = capitalResponse.getData().getIso2();
@@ -62,7 +62,6 @@ public class CountryService {
                 .findFirst()
                 .get().getValue();
         String flagUrl = flagResponse.getData().getFlag();
-
         return new Country(name, code, capital, population, flagUrl);
     }
 }

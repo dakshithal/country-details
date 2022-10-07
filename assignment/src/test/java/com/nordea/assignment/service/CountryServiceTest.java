@@ -1,25 +1,24 @@
 package com.nordea.assignment.service;
 
+import com.nordea.assignment.client.RemoteServiceClient;
 import com.nordea.assignment.dto.*;
+import com.nordea.assignment.model.Countries;
 import com.nordea.assignment.model.Country;
-import com.nordea.assignment.model.CountryListItem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.HttpClientErrorException;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 public class CountryServiceTest {
     @Mock
-    private RestTemplate restTemplate;
+    private RemoteServiceClient remoteClient;
     private CountryService countryService;
 
     final String TEST_URL = "https://countries-remote-url.dummy";
@@ -45,6 +44,9 @@ public class CountryServiceTest {
     final int COUNTRY_2_POPULATION_2_YEAR = 2010;
     final String COUNTRY_2_FLAG = "Flag-2";
 
+    final String COUNTRY_NA = "Country-NA";
+    final String COUNTRY_NA_MSG = "404 NOT_FOUND";
+
     private CountryListResponse countryListResponse;
     private CountryListResponseItem countryListResponseItem1;
     private CountryListResponseItem countryListResponseItem2;
@@ -67,6 +69,10 @@ public class CountryServiceTest {
     private CountryFlagResponse country2FlagResponse;
     private CountryFlagData country2FlagData;
 
+    private CountryCapitalResponse countryNaCapitalResponse;
+    private CountryPopulationResponse countryNaPopulationResponse;
+    private CountryFlagResponse countryNaFlagResponse;
+
     @BeforeEach
     public void setUp() {
         countryListResponse = new CountryListResponse();
@@ -80,7 +86,7 @@ public class CountryServiceTest {
         countryListResponseItem2.setIso2(COUNTRY_2_CODE);
         CountryListResponseItem[] items = { countryListResponseItem1, countryListResponseItem2 };
         countryListResponse.setData(items);
-        Mockito.when(restTemplate.getForObject(TEST_URL, CountryListResponse.class))
+        Mockito.when(remoteClient.getForObject(TEST_URL, CountryListResponse.class))
                 .thenReturn(countryListResponse);
 
         country1CapitalResponse = new CountryCapitalResponse();
@@ -89,7 +95,7 @@ public class CountryServiceTest {
         country1CapitalData.setIso2(COUNTRY_1_CODE);
         country1CapitalData.setCapital(COUNTRY_1_CAPITAL);
         country1CapitalResponse.setData(country1CapitalData);
-        Mockito.when(restTemplate.getForObject(TEST_URL + CAPITAL_QUERY + COUNTRY_1_NAME, CountryCapitalResponse.class))
+        Mockito.when(remoteClient.getForObject(TEST_URL + CAPITAL_QUERY + COUNTRY_1_NAME, CountryCapitalResponse.class))
                 .thenReturn(country1CapitalResponse);
 
         country1PopulationResponse = new CountryPopulationResponse();
@@ -103,14 +109,14 @@ public class CountryServiceTest {
         AnnualPopulation[] country1Populations = { country1AnnualPopulation1, country1AnnualPopulation2 };
         country1PopulationData.setPopulationCounts(country1Populations);
         country1PopulationResponse.setData(country1PopulationData);
-        Mockito.when(restTemplate.getForObject(TEST_URL + POPULATION_QUERY + COUNTRY_1_NAME, CountryPopulationResponse.class))
+        Mockito.when(remoteClient.getForObject(TEST_URL + POPULATION_QUERY + COUNTRY_1_NAME, CountryPopulationResponse.class))
                 .thenReturn(country1PopulationResponse);
 
         country1FlagResponse = new CountryFlagResponse();
         country1FlagData = new CountryFlagData();
         country1FlagData.setFlag(COUNTRY_1_FLAG);
         country1FlagResponse.setData(country1FlagData);
-        Mockito.when(restTemplate.getForObject(TEST_URL + FLAG_QUERY + COUNTRY_1_NAME, CountryFlagResponse.class))
+        Mockito.when(remoteClient.getForObject(TEST_URL + FLAG_QUERY + COUNTRY_1_NAME, CountryFlagResponse.class))
                 .thenReturn(country1FlagResponse);
 
         country2CapitalResponse = new CountryCapitalResponse();
@@ -119,7 +125,7 @@ public class CountryServiceTest {
         country2CapitalData.setIso2(COUNTRY_2_CODE);
         country2CapitalData.setCapital(COUNTRY_2_CAPITAL);
         country2CapitalResponse.setData(country2CapitalData);
-        Mockito.when(restTemplate.getForObject(TEST_URL + CAPITAL_QUERY + COUNTRY_2_NAME, CountryCapitalResponse.class))
+        Mockito.when(remoteClient.getForObject(TEST_URL + CAPITAL_QUERY + COUNTRY_2_NAME, CountryCapitalResponse.class))
                 .thenReturn(country2CapitalResponse);
 
         country2PopulationResponse = new CountryPopulationResponse();
@@ -133,26 +139,43 @@ public class CountryServiceTest {
         AnnualPopulation[] country2Populations = { country2AnnualPopulation1, country2AnnualPopulation2 };
         country2PopulationData.setPopulationCounts(country2Populations);
         country2PopulationResponse.setData(country2PopulationData);
-        Mockito.when(restTemplate.getForObject(TEST_URL + POPULATION_QUERY + COUNTRY_2_NAME, CountryPopulationResponse.class))
+        Mockito.when(remoteClient.getForObject(TEST_URL + POPULATION_QUERY + COUNTRY_2_NAME, CountryPopulationResponse.class))
                 .thenReturn(country2PopulationResponse);
 
         country2FlagResponse = new CountryFlagResponse();
         country2FlagData = new CountryFlagData();
         country2FlagData.setFlag(COUNTRY_2_FLAG);
         country2FlagResponse.setData(country2FlagData);
-        Mockito.when(restTemplate.getForObject(TEST_URL + FLAG_QUERY + COUNTRY_2_NAME, CountryFlagResponse.class))
+        Mockito.when(remoteClient.getForObject(TEST_URL + FLAG_QUERY + COUNTRY_2_NAME, CountryFlagResponse.class))
                 .thenReturn(country2FlagResponse);
 
-        countryService = new CountryService(TEST_URL, CAPITAL_QUERY, POPULATION_QUERY, FLAG_QUERY, restTemplate);
+        countryNaCapitalResponse = new CountryCapitalResponse();
+        countryNaCapitalResponse.setError(true);
+        countryNaCapitalResponse.setMsg(COUNTRY_NA_MSG);
+        Mockito.when(remoteClient.getForObject(TEST_URL + CAPITAL_QUERY + COUNTRY_NA, CountryCapitalResponse.class))
+                .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        countryNaPopulationResponse = new CountryPopulationResponse();
+        countryNaPopulationResponse.setError(true);
+        Mockito.when(remoteClient.getForObject(TEST_URL + POPULATION_QUERY + COUNTRY_NA, CountryPopulationResponse.class))
+                .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        countryNaFlagResponse = new CountryFlagResponse();
+        countryNaFlagResponse.setError(true);
+        Mockito.when(remoteClient.getForObject(TEST_URL + FLAG_QUERY + COUNTRY_NA, CountryFlagResponse.class))
+                .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        countryService = new CountryService(
+                TEST_URL, CAPITAL_QUERY, POPULATION_QUERY, FLAG_QUERY, remoteClient);
     }
 
     @Test
     public void retrieveCountryListSuccess() {
-        List<CountryListItem> countries = countryService.retrieveCountryList();
+        Countries countries = countryService.retrieveCountryList();
         assertNotNull(countries);
-        assertEquals(2, countries.size());
-        assertEquals(COUNTRY_1_NAME, countries.get(0).getName());
-        assertEquals(COUNTRY_2_NAME, countries.get(1).getName());
+        assertEquals(2, countries.getCountries().size());
+        assertEquals(COUNTRY_1_NAME, countries.getCountries().get(0).getName());
+        assertEquals(COUNTRY_2_NAME, countries.getCountries().get(1).getName());
     }
 
     @Test
@@ -172,5 +195,11 @@ public class CountryServiceTest {
         assertEquals(COUNTRY_2_CAPITAL, country2.getCapital());
         assertEquals(COUNTRY_2_POPULATION_1, country2.getPopulation());
         assertEquals(COUNTRY_2_FLAG, country2.getFlagFileUrl());
+    }
+
+    @Test
+    public void retrieveCountryByNameNotAvailable() {
+        Exception exception = assertThrows(Exception.class, () -> countryService.retrieveCountry(COUNTRY_NA));
+        assertEquals(COUNTRY_NA_MSG, exception.getMessage());
     }
 }

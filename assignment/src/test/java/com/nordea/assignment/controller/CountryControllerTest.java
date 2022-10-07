@@ -1,6 +1,7 @@
 package com.nordea.assignment.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nordea.assignment.model.Countries;
 import com.nordea.assignment.model.Country;
 import com.nordea.assignment.model.CountryListItem;
 import com.nordea.assignment.service.CountryService;
@@ -11,15 +12,16 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.HttpClientErrorException;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,37 +48,40 @@ public class CountryControllerTest {
     final String COUNTRY_2_CAPITAL = "Capital-2";
     final int COUNTRY_2_POPULATION = 200000;
     final String COUNTRY_2_FLAG = "Flag-2";
+    final String COUNTRY_NA = "Country-NA";
+    final String COUNTRY_NA_MSG = "Country not found!";
 
     private Country country1;
     private Country country2;
     private CountryListItem countryListItem1;
     private CountryListItem countryListItem2;
-    private List<CountryListItem> countries;
+    private List<CountryListItem> countriesList;
+    private Countries countries;
 
     @BeforeEach
     public void setUp() {
-        countries = new ArrayList<>();
+        countriesList = new ArrayList<>();
 
         country1 = new Country(COUNTRY_1_NAME, COUNTRY_1_CODE, COUNTRY_1_CAPITAL, COUNTRY_1_POPULATION, COUNTRY_1_FLAG);
         countryListItem1 = new CountryListItem(COUNTRY_1_NAME, COUNTRY_1_CODE);
-        countries.add(countryListItem1);
+        countriesList.add(countryListItem1);
 
         country2 = new Country(COUNTRY_2_NAME, COUNTRY_2_CODE, COUNTRY_2_CAPITAL, COUNTRY_2_POPULATION, COUNTRY_2_FLAG);
         countryListItem2 = new CountryListItem(COUNTRY_2_NAME, COUNTRY_2_CODE);
-        countries.add(countryListItem2);
+        countriesList.add(countryListItem2);
+
+        countries = new Countries(countriesList);
     }
 
     @Test
     public void retrieveCountryListSuccess() throws Exception {
         Mockito.when(countryService.retrieveCountryList()).thenReturn(countries);
 
-        mockMvc.perform(get("/countries")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(countries))
+        mockMvc.perform(get("/v1/countries")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].name").value(COUNTRY_1_NAME))
-                .andExpect(jsonPath("$.[1].name").value(COUNTRY_2_NAME));
+                .andExpect(jsonPath("$.countries.[0].name").value(COUNTRY_1_NAME))
+                .andExpect(jsonPath("$.countries.[1].name").value(COUNTRY_2_NAME));
 
         verify(countryService, times(1)).retrieveCountryList();
     }
@@ -86,23 +91,32 @@ public class CountryControllerTest {
         Mockito.when(countryService.retrieveCountry(COUNTRY_1_NAME)).thenReturn(country1);
         Mockito.when(countryService.retrieveCountry(COUNTRY_2_NAME)).thenReturn(country2);
 
-        mockMvc.perform(get("/countries/" + COUNTRY_1_NAME)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(country1))
+        mockMvc.perform(get("/v1/countries/" + COUNTRY_1_NAME)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(COUNTRY_1_NAME))
-                .andExpect(jsonPath("$.countryCode").value(COUNTRY_1_CODE));
+                .andExpect(jsonPath("$.country_code").value(COUNTRY_1_CODE));
 
-        mockMvc.perform(get("/countries/" + COUNTRY_2_NAME)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(country2))
+        mockMvc.perform(get("/v1/countries/" + COUNTRY_2_NAME)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(COUNTRY_2_NAME))
-                .andExpect(jsonPath("$.countryCode").value(COUNTRY_2_CODE));
+                .andExpect(jsonPath("$.country_code").value(COUNTRY_2_CODE));
 
         verify(countryService, times(1)).retrieveCountry(COUNTRY_1_NAME);
         verify(countryService, times(1)).retrieveCountry(COUNTRY_2_NAME);
+    }
+
+    @Test
+    public void retrieveCountryByNameExceptions() throws Exception {
+        Mockito.when(countryService.retrieveCountry(COUNTRY_NA))
+                .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        mockMvc.perform(get("/v1/countries/" + COUNTRY_NA)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.msg").value(COUNTRY_NA_MSG));
+
+        verify(countryService, times(1)).retrieveCountry(COUNTRY_NA);
     }
 }

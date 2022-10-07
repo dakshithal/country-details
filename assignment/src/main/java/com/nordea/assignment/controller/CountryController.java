@@ -1,29 +1,23 @@
 package com.nordea.assignment.controller;
 
+import com.nordea.assignment.model.Countries;
 import com.nordea.assignment.model.Country;
-import com.nordea.assignment.model.CountryListItem;
 import com.nordea.assignment.service.CountryService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
-@RequestMapping(value = "countries")
+@RequestMapping(value = "v1/countries")
+@RequiredArgsConstructor
 public class CountryController {
 
-    private CountryService countryService;
-
-    @Autowired
-    public CountryController(CountryService countryService) {
-        this.countryService = countryService;
-    }
+    private final CountryService countryService;
 
     @GetMapping
-    public List<CountryListItem> retrieveCountryList() {
+    public Countries retrieveCountryList() {
         return countryService.retrieveCountryList();
     }
 
