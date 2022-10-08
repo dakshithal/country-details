@@ -1,0 +1,46 @@
+remote:
+  service:
+    url: https://countriesnow.space/api/v0.1/countries
+    query:
+      capital: /capital/q?country=
+      population: /population/q?country=
+      flag: /flag/images/q?country=
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      country:
+        registerHealthIndicator: true
+        permittedNumberOfCallsInHalfOpenState: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5s
+        slidingWindowSize: 100
+        slidingWindowType: COUNT_BASED
+  retry:
+    instances:
+      country:
+        maxAttempts: 3
+        waitDuration: 5s
+        enableExponentialBackoff: true
+        ignore-exceptions:
+          - io.github.resilience4j.circuitbreaker.CallNotPermittedException
+          - org.springframework.web.client.HttpClientErrorException
+  bulkhead:
+    instances:
+      country:
+        maxConcurrentCalls: 50
+
+management:
+  endpoint:
+    health:
+      show-details: ALWAYS
+  health:
+    circuitbreakers:
+      enabled: true
+
+spring:
+  cloud:
+    discovery:
+      client:
+        composite-indicator:
+          enabled: false
