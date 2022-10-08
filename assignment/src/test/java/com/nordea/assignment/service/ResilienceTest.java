@@ -47,6 +47,8 @@ public class ResilienceTest {
 
     @Test
     public void retryWhenThereIsAnUnexpectedException() {
+        CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker(remoteClient.circuitBreakerName);
+        circuitBreaker.transitionToClosedState();
         CountryListResponse retryResponse = new CountryListResponse();
         retryResponse.setMsg(RETRY_RESPONSE_MSG);
         Mockito.when(restTemplate.getForObject(TEST_URL, CountryListResponse.class))
