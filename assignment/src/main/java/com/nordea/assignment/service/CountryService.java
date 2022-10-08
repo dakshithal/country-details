@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -60,26 +61,38 @@ public class CountryService {
                 remoteClient.getForObject(externalUrl + capitalQuery + countryName, CountryCapitalResponse.class);
         log.debug("Completed retrieving capital for country: " + countryName);
 
-        log.debug("Started retrieving population for country: " + countryName);
-        CountryPopulationResponse populationResponse =
-                remoteClient.getForObject(externalUrl + populationQuery + countryName, CountryPopulationResponse.class);
-        log.debug("Completed retrieving population for country: " + countryName);
-
         log.debug("Started retrieving flag for country: " + countryName);
         CountryFlagResponse flagResponse =
                 remoteClient.getForObject(externalUrl + flagQuery + countryName, CountryFlagResponse.class);
         log.debug("Completed retrieving flag for country: " + countryName);
 
-        log.debug("Started creating response for country: " + countryName);
+        log.debug("Started retrieving population for country: " + countryName);
+        CountryPopulationResponse populationResponse = null;
+        try {
+            populationResponse =
+                    remoteClient.getForObject(externalUrl + populationQuery + countryName, CountryPopulationResponse.class);
+            log.debug("Completed retrieving population for country: " + countryName);
+        } catch (HttpClientErrorException e) {
+            log.error("Population data is unavailable for country: " + countryName);
+        }
+
         String name = capitalResponse.getData().getName();
         String capital = capitalResponse.getData().getCapital();
         String code = capitalResponse.getData().getIso2();
-        int population = Arrays.stream(populationResponse.getData().getPopulationCounts())
-                .sorted(Comparator.comparingInt(AnnualPopulation::getYear).reversed())
-                .findFirst()
-                .get().getValue();
         String flagUrl = flagResponse.getData().getFlag();
-        log.debug("Completed creating response for country: " + countryName);
-        return new Country(name, code, capital, population, flagUrl);
+        if (populationResponse == null) {
+            Country country = new Country();
+            country.setName(name);
+            country.setCountryCode(code);
+            country.setCapital(capital);
+            country.setFlagFileUrl(flagUrl);
+            return country;
+        } else {
+            int population = Arrays.stream(populationResponse.getData().getPopulationCounts())
+                    .sorted(Comparator.comparingInt(AnnualPopulation::getYear).reversed())
+                    .findFirst()
+                    .get().getValue();
+            return new Country(name, code, capital, flagUrl, population);
+        }
     }
 }

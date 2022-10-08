@@ -41,13 +41,13 @@ public class CountryControllerTest {
     final String COUNTRY_1_NAME = "Country-1";
     final String COUNTRY_1_CODE = "C1";
     final String COUNTRY_1_CAPITAL = "Capital-1";
-    final int COUNTRY_1_POPULATION = 100000;
     final String COUNTRY_1_FLAG = "Flag-1";
+    final int COUNTRY_1_POPULATION = 100000;
     final String COUNTRY_2_NAME = "Country-2";
     final String COUNTRY_2_CODE = "C2";
     final String COUNTRY_2_CAPITAL = "Capital-2";
-    final int COUNTRY_2_POPULATION = 200000;
     final String COUNTRY_2_FLAG = "Flag-2";
+    final int COUNTRY_2_POPULATION = 200000;
     final String COUNTRY_NA = "Country-NA";
     final String COUNTRY_NA_MSG = "Country not found!";
 
@@ -62,11 +62,11 @@ public class CountryControllerTest {
     public void setUp() {
         countriesList = new ArrayList<>();
 
-        country1 = new Country(COUNTRY_1_NAME, COUNTRY_1_CODE, COUNTRY_1_CAPITAL, COUNTRY_1_POPULATION, COUNTRY_1_FLAG);
+        country1 = new Country(COUNTRY_1_NAME, COUNTRY_1_CODE, COUNTRY_1_CAPITAL, COUNTRY_1_FLAG, COUNTRY_1_POPULATION);
         countryListItem1 = new CountryListItem(COUNTRY_1_NAME, COUNTRY_1_CODE);
         countriesList.add(countryListItem1);
 
-        country2 = new Country(COUNTRY_2_NAME, COUNTRY_2_CODE, COUNTRY_2_CAPITAL, COUNTRY_2_POPULATION, COUNTRY_2_FLAG);
+        country2 = new Country(COUNTRY_2_NAME, COUNTRY_2_CODE, COUNTRY_2_CAPITAL, COUNTRY_2_FLAG, COUNTRY_2_POPULATION);
         countryListItem2 = new CountryListItem(COUNTRY_2_NAME, COUNTRY_2_CODE);
         countriesList.add(countryListItem2);
 

@@ -1,6 +1,7 @@
 package com.nordea.assignment.exception;
 
 import com.nordea.assignment.model.ErrorMsg;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -19,6 +20,12 @@ public class CustomExceptionHandler {
                 return new ResponseEntity<>(new ErrorMsg("Bad Request!"), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(new ErrorMsg(e.getMessage()), e.getStatusCode());
+    }
+
+    @ExceptionHandler(CallNotPermittedException.class)
+    public ResponseEntity<ErrorMsg> respondServerUnavailable(HttpClientErrorException e) {
+        return new ResponseEntity<>(new ErrorMsg("Country service is currently down, please retry later."),
+                HttpStatus.SERVICE_UNAVAILABLE);
     }
 
     @ExceptionHandler(Exception.class)
