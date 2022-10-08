@@ -62,9 +62,13 @@ public class CountryService {
         log.debug("Completed retrieving capital for country: " + countryName);
 
         log.debug("Started retrieving flag for country: " + countryName);
-        CountryFlagResponse flagResponse =
-                remoteClient.getForObject(externalUrl + flagQuery + countryName, CountryFlagResponse.class);
-        log.debug("Completed retrieving flag for country: " + countryName);
+        CountryFlagResponse flagResponse = null;
+        try {
+            flagResponse = remoteClient.getForObject(externalUrl + flagQuery + countryName, CountryFlagResponse.class);
+            log.debug("Completed retrieving flag for country: " + countryName);
+        } catch (HttpClientErrorException e) {
+            log.error("Flag data is unavailable for country: " + countryName);
+        }
 
         log.debug("Started retrieving population for country: " + countryName);
         CountryPopulationResponse populationResponse = null;
@@ -79,7 +83,7 @@ public class CountryService {
         String name = capitalResponse.getData().getName();
         String capital = capitalResponse.getData().getCapital();
         String code = capitalResponse.getData().getIso2();
-        String flagUrl = flagResponse.getData().getFlag();
+        String flagUrl = flagResponse == null ? "" : flagResponse.getData().getFlag();
         if (populationResponse == null) {
             Country country = new Country();
             country.setName(name);

@@ -1,4 +1,6 @@
-import { Box, List, ListItem, ListItemButton, Typography } from "@mui/material"
+import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material'
+import FlagIcon from '@mui/icons-material/Flag';
+import FlagCircleIcon from '@mui/icons-material/FlagCircle';
 
 export interface CountryListItem {
   name: string;
@@ -7,19 +9,40 @@ export interface CountryListItem {
 
 export interface CountryListProps {
   countries: CountryListItem[];
+  selectedCountry?: CountryListItem;
   setSelectedCountry: ((selectedCountry: CountryListItem) => void);
 }
 
-export const CountryList = ({ countries, setSelectedCountry }: CountryListProps) => {
+export const CountryList = ({ countries, selectedCountry, setSelectedCountry }: CountryListProps) => {
   return (
-    <Box id="country-list" style={{width: "100%"}}>
-      <Typography variant="h2">List of Countries</Typography> 
-      <List>
+    <Box
+      id='country-list'
+      style={{
+        flex: 1,
+        marginRight: '20px'
+      }}
+    >
+      <Typography variant='h2'>List of Countries</Typography> 
+      <List
+      sx={{
+        overflow: 'auto',
+        maxHeight: 720,
+      }}
+      >
       {
         countries.map((country) => {
           return (
-            <ListItem key={country.country_code} onClick={() => setSelectedCountry(country)}>
-              <ListItemButton>{country.name}</ListItemButton>
+            <ListItem key={country.name} onClick={() => setSelectedCountry(country)}>
+              <ListItemButton>
+                <ListItemIcon>
+                  {
+                    selectedCountry && selectedCountry.country_code === country.country_code
+                    ? <FlagIcon color='primary' fontSize='large'/>
+                    : <FlagCircleIcon />
+                  }
+                </ListItemIcon>
+                <ListItemText primary={country.name} />
+              </ListItemButton>
             </ListItem>
           );
         })
