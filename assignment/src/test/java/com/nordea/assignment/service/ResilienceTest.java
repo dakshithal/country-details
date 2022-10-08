@@ -39,7 +39,7 @@ public class ResilienceTest {
 
     @Test
     public void doesNotCallRemoteServiceWhenCircuitBreakerIsOpen() {
-        CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker(remoteClient.circuitBreakerName);
+        CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker(remoteClient.clientIdentifier);
         circuitBreaker.transitionToOpenState();
         assertThrows(CallNotPermittedException.class, () -> countryService.retrieveCountry(COUNTRY_1_NAME));
         verify(restTemplate, times(0)).getForObject(anyString(), any());
@@ -47,7 +47,7 @@ public class ResilienceTest {
 
     @Test
     public void retryWhenThereIsAnUnexpectedException() {
-        CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker(remoteClient.circuitBreakerName);
+        CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker(remoteClient.clientIdentifier);
         circuitBreaker.transitionToClosedState();
         CountryListResponse retryResponse = new CountryListResponse();
         retryResponse.setMsg(RETRY_RESPONSE_MSG);

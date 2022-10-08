@@ -11,11 +11,11 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class RemoteServiceClient {
     private final RestTemplate restTemplate;
-    public final String circuitBreakerName = "remote-service";
+    public final String clientIdentifier = "country";
 
-    @CircuitBreaker(name = circuitBreakerName)
-    @Retry(name = circuitBreakerName)
-    @Bulkhead(name = circuitBreakerName)
+    @CircuitBreaker(name = clientIdentifier)
+    @Retry(name = clientIdentifier)
+    @Bulkhead(name = clientIdentifier)
     public <T> T getForObject(String url, Class<T> responseType) {
         return restTemplate.getForObject(url, responseType);
     }
