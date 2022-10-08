@@ -1,5 +1,4 @@
-import { List, ListItem, ListItemText, Typography } from "@mui/material"
-import { Container } from "@mui/system"
+import { Box, List, ListItem, ListItemButton, Typography } from "@mui/material"
 
 export interface CountryListItem {
   name: string;
@@ -13,19 +12,19 @@ export interface CountryListProps {
 
 export const CountryList = ({ countries, setSelectedCountry }: CountryListProps) => {
   return (
-    <Container id="country-list">
+    <Box id="country-list" style={{width: "100%"}}>
       <Typography variant="h2">List of Countries</Typography> 
       <List>
       {
         countries.map((country) => {
           return (
-            <ListItem key={country.country_code}>
-              <ListItemText>{country.name}</ListItemText>
+            <ListItem key={country.country_code} onClick={() => setSelectedCountry(country)}>
+              <ListItemButton>{country.name}</ListItemButton>
             </ListItem>
           );
         })
       }
       </List>
-    </Container>
+    </Box>
   )
 }

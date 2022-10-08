@@ -1,5 +1,4 @@
-import { Card, CardContent, Typography } from "@mui/material"
-import { Container } from "@mui/system"
+import { Box, Card, CardContent, Typography } from "@mui/material"
 
 export interface Country {
   name: string;
@@ -15,7 +14,7 @@ export interface CountryDetailsProps {
 
 export const CountryDetails = ({ country }: CountryDetailsProps) => {
   return (
-    <Container id="country-details">
+    <Box id="country-details" style={{width: "100%"}}>
       <Typography variant="h2">
         Country Details
       </Typography>
@@ -42,7 +41,6 @@ export const CountryDetails = ({ country }: CountryDetailsProps) => {
             </CardContent>
           </Card>
       }
-
-    </Container>
+    </Box>
   )
 }
