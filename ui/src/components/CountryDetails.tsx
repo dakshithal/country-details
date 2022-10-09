@@ -9,7 +9,7 @@ export interface Country {
 }
 
 export interface CountryDetailsProps {
-  country?: Country;
+  country?: Country | null;
 }
 
 export const CountryDetails = ({ country }: CountryDetailsProps) => {
@@ -22,7 +22,9 @@ export const CountryDetails = ({ country }: CountryDetailsProps) => {
       }}
     >
       <Typography variant='h2'>
-        {country ? country.name : 'Please select a country to view details'}
+        {!country
+          ? `${country === undefined ? 'Please select a country to view details' : 'Loading country details...'}`
+          : country.name }
       </Typography>
       {
         country

@@ -26,7 +26,7 @@ export const CountryList = ({ countries, selectedCountry, setSelectedCountry }: 
       <List
       sx={{
         overflow: 'auto',
-        maxHeight: 720,
+        maxHeight: 750,
       }}
       >
       {

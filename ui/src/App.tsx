@@ -3,14 +3,14 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import { Box, Divider } from '@mui/material';
+import { Backdrop, Box, CircularProgress, Divider } from '@mui/material';
 import { CountryList, CountryListItem } from './components/CountryList';
 import { Country, CountryDetails } from './components/CountryDetails';
 
 function App() {
   const [countries, setCountries] = useState<CountryListItem[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<CountryListItem>();
-  const [selectedCountryDetails, setSelectedCountryDetails] = useState<Country>();
+  const [selectedCountryDetails, setSelectedCountryDetails] = useState<Country | null>();
 
   useEffect(() => {
     fetch('http://localhost:8080/v1/countries')
@@ -18,17 +18,19 @@ function App() {
         return response.json();
       })
       .then((countriesResponse: { countries: CountryListItem[]}) => {
-        setCountries(countriesResponse.countries);
+        setCountries(countriesResponse.countries
+          .sort((c1, c2) => c1.name.localeCompare(c2.name)));
       })
       .catch((e) => {
         console.error('Error while fetching country list', e);
-      })
-  }, []);
+      });
+  }, [setCountries]);
 
   useEffect(() => {
     if (!selectedCountry) {
       return;
     }
+    setSelectedCountryDetails(null);
     fetch(`http://localhost:8080/v1/countries/${selectedCountry.name}`)
       .then((response) => {
         return response.json();
@@ -38,8 +40,9 @@ function App() {
       })
       .catch((e) => {
         console.error(`Error while fetching country details for ${selectedCountry.name}`, e);
-      })
-  }, [selectedCountry]);
+        setSelectedCountryDetails(undefined);
+      });
+  }, [selectedCountry, setSelectedCountryDetails]);
 
   return (
     <Box
@@ -58,6 +61,12 @@ function App() {
       <CountryDetails
         country={selectedCountryDetails}
       />
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={countries.length === 0 || selectedCountryDetails === null}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Box>
   );
 }
