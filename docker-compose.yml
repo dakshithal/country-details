@@ -1,0 +1,9 @@
+services:
+  country:
+    build: ./assignment
+    ports:
+      - "8080:8080"
+  ui:
+    build: ./ui
+    ports:
+      - "3000:3000"
